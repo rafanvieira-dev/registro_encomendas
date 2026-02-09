@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const idCampo = document.getElementById("idEncomenda");
   if (idCampo) idCampo.value = gerarIdEncomenda();
 
-  // Inicializa entrega e consulta
+  // Inicializa entrega e consulta, se estiver nas respectivas páginas
   if (document.getElementById("listaEncomendas")) carregarEncomendasPendentes();
   if (document.getElementById("tabela")) mostrarConsulta();
 });
@@ -36,9 +36,7 @@ if (formCadastro) {
 
     let fotoBase64 = null;
     const arquivo = document.getElementById("foto").files[0];
-    if (arquivo) {
-      fotoBase64 = await converterParaBase64(arquivo);
-    }
+    if (arquivo) fotoBase64 = await converterParaBase64(arquivo);
 
     const encomenda = {
       id: document.getElementById("idEncomenda").value,
@@ -60,7 +58,7 @@ if (formCadastro) {
     localStorage.setItem("encomendas", JSON.stringify(lista));
 
     alert("Encomenda cadastrada com sucesso!");
-    window.location.href = "entrega.html"; // redireciona automaticamente para entrega
+    window.location.href = "entrega.html"; // redireciona automaticamente
   });
 }
 
@@ -97,7 +95,6 @@ function registrarEntrega(idEncomenda) {
   const e = lista.find(en => en.id === idEncomenda);
   if (!e) return;
 
-  // Prompt para dados da entrega
   e.entrega.retirante = prompt("Nome de quem retirou:") || "";
   e.entrega.documento = prompt("Documento:") || "";
   e.entrega.dataHora = new Date().toISOString();
