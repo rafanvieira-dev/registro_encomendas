@@ -1,33 +1,37 @@
-body {
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
   font-family: Arial, sans-serif;
-  margin: 40px;
 }
 
-nav a {
-  display: block;
-  margin: 10px 0;
+body {
+  background-color: #f4f6f8;
+  padding: 20px;
+  color: #333;
 }
 
-input, button {
-  display: block;
-  margin: 8px 0;
-  padding: 6px;
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #1f2937;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
+form {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 1000px;
+  margin: 0 auto 20px auto;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-th, td {
-  border: 1px solid #ccc;
-  padding: 6px;
-}
 .linha {
   display: flex;
+  flex-wrap: wrap;
   gap: 15px;
   margin-bottom: 15px;
-  flex-wrap: wrap;
 }
 
 .campo {
@@ -39,11 +43,68 @@ th, td {
 
 label {
   font-weight: bold;
-  margin-bottom: 4px;
+  margin-bottom: 5px;
 }
 
-input {
+input, select {
   padding: 8px;
   font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
+button {
+  background-color: #2563eb;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #1e40af;
+}
+
+a {
+  text-decoration: none;
+  color: #2563eb;
+  font-weight: bold;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #2563eb;
+  color: #fff;
+}
+
+tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+@media (max-width: 768px) {
+  .linha {
+    flex-direction: column;
+  }
+}
