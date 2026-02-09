@@ -1,13 +1,7 @@
-// ====================
-// GERAR ID AUTOMÁTICO
-// ====================
-function gerarIdEncomenda() {
-  return "ENC-" + Date.now();
-}
+// GERAR ID
+function gerarIdEncomenda() { return "ENC-" + Date.now(); }
 
-// ====================
-// INICIALIZAÇÃO AO CARREGAR
-// ====================
+// INICIALIZAÇÃO
 document.addEventListener("DOMContentLoaded", () => {
   const idCampo = document.getElementById("idEncomenda");
   if (idCampo) idCampo.value = gerarIdEncomenda();
@@ -16,14 +10,11 @@ document.addEventListener("DOMContentLoaded", () => {
   if (document.getElementById("tabela")) mostrarConsulta();
 });
 
-// ====================
-// CADASTRO DE ENCOMENDAS
-// ====================
+// CADASTRO
 const formCadastro = document.getElementById("formCadastro");
 if (formCadastro) {
   formCadastro.addEventListener("submit", function (e) {
     e.preventDefault();
-
     const encomenda = {
       id: document.getElementById("idEncomenda").value,
       rastreio: document.getElementById("rastreio").value,
@@ -37,28 +28,21 @@ if (formCadastro) {
       entregue: false,
       entrega: null
     };
-
     let lista = JSON.parse(localStorage.getItem("encomendas")) || [];
     lista.push(encomenda);
     localStorage.setItem("encomendas", JSON.stringify(lista));
-
     alert("Encomenda cadastrada com sucesso!");
-
-    // Redireciona automaticamente para a entrega
-    window.location.href = "entrega.html";
+    window.location.href = "entrega.html"; // redireciona
   });
 }
 
-// ====================
 // ENTREGAS
-// ====================
 function carregarEncomendasPendentes() {
   const lista = JSON.parse(localStorage.getItem("encomendas")) || [];
   const tbody = document.getElementById("listaEncomendas");
   if (!tbody) return;
-
   tbody.innerHTML = "";
-  lista.forEach((e, index) => {
+  lista.forEach(e => {
     if (!e.entregue) {
       const tr = document.createElement("tr");
       tr.innerHTML = `
@@ -67,9 +51,7 @@ function carregarEncomendasPendentes() {
         <td>${e.destinatario}</td>
         <td>${e.apartamento}</td>
         <td>${e.bloco}</td>
-        <td>
-          <button onclick="registrarEntrega('${e.id}')">Registrar Entrega</button>
-        </td>
+        <td><button onclick="registrarEntrega('${e.id}')">Registrar Entrega</button></td>
       `;
       tbody.appendChild(tr);
     }
@@ -80,46 +62,29 @@ function registrarEntrega(idEncomenda) {
   let lista = JSON.parse(localStorage.getItem("encomendas")) || [];
   const encomenda = lista.find(e => e.id === idEncomenda);
   if (!encomenda) return alert("Encomenda não encontrada.");
-
   const retirante = prompt("Nome de quem retirou:");
   const documento = prompt("Documento de quem retirou:");
-
-  if (!retirante || !documento) {
-    alert("Entrega cancelada.");
-    return;
-  }
-
+  if (!retirante || !documento) return alert("Entrega cancelada.");
   encomenda.entregue = true;
-  encomenda.entrega = {
-    retirante,
-    documento,
-    dataHora: new Date().toISOString()
-  };
-
+  encomenda.entrega = { retirante, documento, dataHora: new Date().toISOString() };
   localStorage.setItem("encomendas", JSON.stringify(lista));
   carregarEncomendasPendentes();
 }
 
-// ====================
 // CONSULTA
-// ====================
 function mostrarConsulta() {
   const lista = JSON.parse(localStorage.getItem("encomendas")) || [];
   const tbody = document.getElementById("tabela");
   if (!tbody) return;
-
   tbody.innerHTML = "";
-
   if (lista.length === 0) {
     tbody.innerHTML = `<tr><td colspan="12">Nenhuma encomenda registrada</td></tr>`;
     return;
   }
-
   lista.forEach(e => {
     const status = e.entregue ? "✅ Entregue" : "📦 Pendente";
     const dataEntrega = e.entrega ? new Date(e.entrega.dataHora).toLocaleString("pt-BR") : "-";
     const retirante = e.entrega ? e.entrega.retirante : "-";
-
     tbody.innerHTML += `
       <tr>
         <td>${e.id}</td>
