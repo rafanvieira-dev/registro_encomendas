@@ -30,7 +30,7 @@ function mostrarDetalhes(id) {
   const e = lista.find(en => en.id === id);
   if (!e) return alert("Encomenda não encontrada.");
 
-  // Criar modal simples
+  // Criar modal
   const modal = document.createElement("div");
   modal.style.position = "fixed";
   modal.style.top = "0";
@@ -66,3 +66,8 @@ function mostrarDetalhes(id) {
   document.body.appendChild(modal);
   document.getElementById("fecharModal").onclick = () => modal.remove();
 }
+
+// Inicializar consulta ao carregar a página
+document.addEventListener("DOMContentLoaded", () => {
+  if (document.getElementById("tabela")) mostrarConsulta();
+});
