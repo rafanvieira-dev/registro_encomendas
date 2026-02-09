@@ -1,21 +1,18 @@
 // ====================
-// FUNÇÃO PARA GERAR ID AUTOMÁTICO
+// GERAR ID AUTOMÁTICO
 // ====================
 function gerarIdEncomenda() {
   return "ENC-" + Date.now();
 }
 
 // ====================
-// CARREGAR ID AUTOMÁTICO NO CADASTRO
+// INICIALIZAÇÃO AO CARREGAR
 // ====================
 document.addEventListener("DOMContentLoaded", () => {
   const idCampo = document.getElementById("idEncomenda");
   if (idCampo) idCampo.value = gerarIdEncomenda();
 
-  // Carregar dados de entrega se estiver na página
   if (document.getElementById("listaEncomendas")) carregarEncomendasPendentes();
-
-  // Carregar dados de consulta se estiver na página
   if (document.getElementById("tabela")) mostrarConsulta();
 });
 
@@ -47,7 +44,7 @@ if (formCadastro) {
 
     alert("Encomenda cadastrada com sucesso!");
 
-    // Redireciona automaticamente para a página de entrega
+    // Redireciona automaticamente para a entrega
     window.location.href = "entrega.html";
   });
 }
@@ -71,7 +68,7 @@ function carregarEncomendasPendentes() {
         <td>${e.apartamento}</td>
         <td>${e.bloco}</td>
         <td>
-          <button onclick="registrarEntrega(${index})">Registrar Entrega</button>
+          <button onclick="registrarEntrega('${e.id}')">Registrar Entrega</button>
         </td>
       `;
       tbody.appendChild(tr);
@@ -79,9 +76,10 @@ function carregarEncomendasPendentes() {
   });
 }
 
-function registrarEntrega(index) {
-  const lista = JSON.parse(localStorage.getItem("encomendas")) || [];
-  const encomenda = lista[index];
+function registrarEntrega(idEncomenda) {
+  let lista = JSON.parse(localStorage.getItem("encomendas")) || [];
+  const encomenda = lista.find(e => e.id === idEncomenda);
+  if (!encomenda) return alert("Encomenda não encontrada.");
 
   const retirante = prompt("Nome de quem retirou:");
   const documento = prompt("Documento de quem retirou:");
