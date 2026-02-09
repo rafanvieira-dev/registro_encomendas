@@ -2,13 +2,26 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Cadastrar Encomenda</title>
+  <title>Cadastro de Encomendas</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h2>📥 Cadastro de Encomenda</h2>
 
-  <form id="formCadastro">
+<h1>📦 Cadastro de Encomendas</h1>
+
+<form id="formCadastro">
+
+  <div class="linha">
+    <div class="campo">
+      <label>ID da Encomenda (gerado)</label>
+      <input type="text" id="idEncomenda" readonly>
+    </div>
+
+    <div class="campo">
+      <label>Número de Rastreio</label>
+      <input type="text" id="rastreio" required>
+    </div>
+  </div>
 
   <div class="linha">
     <div class="campo">
@@ -29,32 +42,32 @@
 
   <div class="linha">
     <div class="campo">
-      <label>ID da Encomenda</label>
-      <input type="text" id="idEncomenda" required>
+      <label>Transportadora / Empresa</label>
+      <input type="text" id="transportadora" required>
     </div>
 
     <div class="campo">
-      <label>Transportadora / Empresa</label>
-      <input type="text" id="transportadora" required>
+      <label>Funcionário que Recebeu</label>
+      <input type="text" id="funcionario" required>
+    </div>
+
+    <div class="campo">
+      <label>Documento do Funcionário</label>
+      <input type="text" id="documento" required>
     </div>
   </div>
 
   <div class="linha">
     <div class="campo">
-      <label>Funcionário</label>
-      <input type="text" id="funcionario" required>
-    </div>
-
-    <div class="campo">
-      <label>Documento</label>
-      <input type="text" id="documento" required>
-    </div>
-
-    <div class="campo">
-      <label>Data e Hora</label>
+      <label>Data e Hora do Recebimento</label>
       <input type="datetime-local" id="dataHora" required>
     </div>
   </div>
 
   <button type="submit">Cadastrar Encomenda</button>
+
 </form>
+
+<script src="script.js"></script>
+</body>
+</html>
