@@ -9,17 +9,52 @@
   <h2>📥 Cadastro de Encomenda</h2>
 
   <form id="formCadastro">
-    <input type="text" placeholder="ID da Encomenda" required id="id">
-    <input type="text" placeholder="Destinatário" required id="destinatario">
-    <input type="text" placeholder="Transportadora / Empresa" required id="empresa">
-    <input type="text" placeholder="Documento de quem recebeu" required id="docRecebeu">
-    <input type="datetime-local" required id="dataRecebimento">
 
-    <button type="submit">Salvar</button>
-  </form>
+  <div class="linha">
+    <div class="campo">
+      <label>Nome do Destinatário</label>
+      <input type="text" id="destinatario" required>
+    </div>
 
-  <a href="index.html">⬅ Voltar</a>
+    <div class="campo">
+      <label>Apartamento</label>
+      <input type="text" id="apartamento" required>
+    </div>
 
-  <script src="script.js"></script>
-</body>
-</html>
+    <div class="campo">
+      <label>Bloco</label>
+      <input type="text" id="bloco" required>
+    </div>
+  </div>
+
+  <div class="linha">
+    <div class="campo">
+      <label>ID da Encomenda</label>
+      <input type="text" id="idEncomenda" required>
+    </div>
+
+    <div class="campo">
+      <label>Transportadora / Empresa</label>
+      <input type="text" id="transportadora" required>
+    </div>
+  </div>
+
+  <div class="linha">
+    <div class="campo">
+      <label>Funcionário</label>
+      <input type="text" id="funcionario" required>
+    </div>
+
+    <div class="campo">
+      <label>Documento</label>
+      <input type="text" id="documento" required>
+    </div>
+
+    <div class="campo">
+      <label>Data e Hora</label>
+      <input type="datetime-local" id="dataHora" required>
+    </div>
+  </div>
+
+  <button type="submit">Cadastrar Encomenda</button>
+</form>
