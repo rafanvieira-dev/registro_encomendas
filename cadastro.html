@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastrar Encomenda</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>📥 Cadastro de Encomenda</h2>
+
+  <form id="formCadastro">
+    <input type="text" placeholder="ID da Encomenda" required id="id">
+    <input type="text" placeholder="Destinatário" required id="destinatario">
+    <input type="text" placeholder="Transportadora / Empresa" required id="empresa">
+    <input type="text" placeholder="Documento de quem recebeu" required id="docRecebeu">
+    <input type="datetime-local" required id="dataRecebimento">
+
+    <button type="submit">Salvar</button>
+  </form>
+
+  <a href="index.html">⬅ Voltar</a>
+
+  <script src="script.js"></script>
+</body>
+</html>
