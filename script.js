@@ -1,26 +1,29 @@
 const encomendas = JSON.parse(localStorage.getItem("encomendas")) || [];
 
 // Cadastro
-const formCadastro = document.getElementById("formCadastro");
-if (formCadastro) {
-  formCadastro.addEventListener("submit", e => {
-    e.preventDefault();
+document.getElementById("formCadastro").addEventListener("submit", function (e) {
+  e.preventDefault();
 
-    encomendas.push({
-      id: id.value,
-      destinatario: destinatario.value,
-      empresa: empresa.value,
-      docRecebeu: docRecebeu.value,
-      dataRecebimento: dataRecebimento.value,
-      retirou: "",
-      dataEntrega: ""
-    });
+  const encomenda = {
+    destinatario: document.getElementById("destinatario").value,
+    apartamento: document.getElementById("apartamento").value,
+    bloco: document.getElementById("bloco").value,
+    idEncomenda: document.getElementById("idEncomenda").value,
+    transportadora: document.getElementById("transportadora").value,
+    funcionario: document.getElementById("funcionario").value,
+    documento: document.getElementById("documento").value,
+    dataHora: document.getElementById("dataHora").value,
+    entregue: false
+  };
 
-    localStorage.setItem("encomendas", JSON.stringify(encomendas));
-    alert("Encomenda cadastrada!");
-    formCadastro.reset();
-  });
-}
+  let lista = JSON.parse(localStorage.getItem("encomendas")) || [];
+  lista.push(encomenda);
+  localStorage.setItem("encomendas", JSON.stringify(lista));
+
+  alert("Encomenda cadastrada com sucesso!");
+  this.reset();
+});
+
 
 // Entrega
 const formEntrega = document.getElementById("formEntrega");
