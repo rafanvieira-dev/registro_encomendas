@@ -23,3 +23,27 @@ th, td {
   border: 1px solid #ccc;
   padding: 6px;
 }
+.linha {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 180px;
+}
+
+label {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+input {
+  padding: 8px;
+  font-size: 14px;
+}
+
