@@ -1,143 +1,124 @@
-// =====================
-// FUNÇÕES ÚTEIS
-// =====================
-function gerarIdEncomenda() {
-  return "ENC-" + Date.now();
-}
+let assinaturaPad;
 
-function converterParaBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = error => reject(error);
-    reader.readAsDataURL(file);
-  });
-}
-
-// =====================
-// CADASTRO DE ENCOMENDAS
-// =====================
+// ====== ENTREGA ======
 document.addEventListener("DOMContentLoaded", () => {
-  const idCampo = document.getElementById("idEncomenda");
-  if (idCampo) idCampo.value = gerarIdEncomenda();
-
-  if (document.getElementById("listaEncomendas")) carregarEncomendasPendentes();
-  if (document.getElementById("tabela")) mostrarConsulta();
+  carregarPendentes();
+  carregarConsulta();
 });
 
-// =====================
-// REGISTRAR ENTREGA
-// =====================
-
-function carregarEncomendasPendentes() {
+function carregarPendentes() {
   const lista = JSON.parse(localStorage.getItem("encomendas")) || [];
-  const tbody = document.querySelector("#listaEncomendas tbody");
+  const tbody = document.getElementById("listaPendentes");
   if (!tbody) return;
   tbody.innerHTML = "";
 
-  lista.forEach(e => {
-    if (!e.entregue) {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
+  lista.filter(e => !e.entregue).forEach(e => {
+    tbody.innerHTML += `
+      <tr>
         <td>${e.id}</td>
         <td>${e.rastreio}</td>
         <td>${e.destinatario}</td>
         <td>${e.apartamento}</td>
         <td>${e.bloco}</td>
-        <td><button onclick='mostrarFormularioEntrega("${e.id}")'>Registrar Entrega</button></td>
-      `;
-      tbody.appendChild(tr);
-    }
+        <td><button onclick="abrirEntrega('${e.id}')">Registrar</button></td>
+      </tr>
+    `;
   });
 }
 
-function mostrarFormularioEntrega(idEncomenda) {
-  // Exibe o formulário de entrega e a assinatura somente para a encomenda selecionada
-  const formEntrega = document.getElementById("registroEntrega");
-  formEntrega.style.display = "block";
-  document.getElementById("idEncomendaEntrega").value = idEncomenda;
-  
-  // Inicializa a área de assinatura no canvas
-  let canvas = document.getElementById("assinatura");
-  signaturePad = new SignaturePad(canvas);
-  signaturePad.clear();
+function abrirEntrega(id) {
+  document.getElementById("modalEntrega").style.display = "flex";
+  document.getElementById("entregaId").value = id;
+
+  const canvas = document.getElementById("assinatura");
+  assinaturaPad = new SignaturePad(canvas);
 }
 
-function registrarEntrega() {
-  let lista = JSON.parse(localStorage.getItem("encomendas")) || [];
-  const encomendaId = document.getElementById("idEncomendaEntrega").value;
-  const encomenda = lista.find(e => e.id === encomendaId);
+function limparAssinatura() {
+  assinaturaPad.clear();
+}
 
-  if (!encomenda) {
-    alert("Encomenda não encontrada!");
-    return;
-  }
+function fecharModal() {
+  document.querySelectorAll(".modal").forEach(m => m.style.display = "none");
+}
 
-  // Preenche os campos do formulário
-  encomenda.entrega.retirante = document.getElementById("retirante").value;
-  encomenda.entrega.documento = document.getElementById("documentoRetirante").value;
-  encomenda.entrega.dataHora = document.getElementById("dataHoraEntrega").value || new Date().toISOString();
+function confirmarEntrega() {
+  const lista = JSON.parse(localStorage.getItem("encomendas")) || [];
+  const id = document.getElementById("entregaId").value;
+
+  const encomenda = lista.find(e => e.id === id);
   encomenda.entregue = true;
-
-  // Salvar assinatura
-  if (!signaturePad.isEmpty()) {
-    encomenda.entrega.assinatura = signaturePad.toDataURL("image/png");
-  }
+  encomenda.entrega = {
+    nome: document.getElementById("nomeRecebedor").value,
+    documento: document.getElementById("docRecebedor").value,
+    assinatura: assinaturaPad.toDataURL(),
+    dataHora: new Date().toISOString()
+  };
 
   localStorage.setItem("encomendas", JSON.stringify(lista));
-  alert("Entrega registrada com sucesso!");
-
-  window.location.href = "consulta.html"; // redireciona para consulta
+  alert("Entrega registrada!");
+  location.reload();
 }
 
-// =====================
-// CONSULTA E POP-UP DE DETALHES
-// =====================
-function mostrarConsulta() {
+// ====== CONSULTA ======
+function carregarConsulta() {
   const lista = JSON.parse(localStorage.getItem("encomendas")) || [];
-  const tbody = document.getElementById("tabela");
+  const tbody = document.getElementById("tabelaConsulta");
   if (!tbody) return;
   tbody.innerHTML = "";
 
   lista.forEach(e => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${e.id}</td>
-      <td>${e.rastreio}</td>
-      <td>${e.destinatario}</td>
-      <td>${e.apartamento}</td>
-      <td>${e.bloco}</td>
-      <td><button onclick='mostrarDetalhes("${e.id}")'>Detalhes</button></td>
+    tbody.innerHTML += `
+      <tr>
+        <td>${e.id}</td>
+        <td>${e.rastreio}</td>
+        <td>${e.destinatario}</td>
+        <td>${e.apartamento}</td>
+        <td>${e.bloco}</td>
+        <td><button onclick="detalhes('${e.id}')">Detalhes</button></td>
+      </tr>
     `;
-    tbody.appendChild(tr);
   });
 }
 
-function mostrarDetalhes(id) {
+function detalhes(id) {
   const lista = JSON.parse(localStorage.getItem("encomendas")) || [];
-  const e = lista.find(en => en.id === id);
-  if (!e) return alert("Encomenda não encontrada.");
+  const e = lista.find(x => x.id === id);
 
-  const modal = document.createElement("div");
-  modal.style.position = "fixed";
-  modal.style.top = "0";
-  modal.style.left = "0";
-  modal.style.width = "100%";
-  modal.style.height = "100%";
-  modal.style.background = "rgba(0,0,0,0.7)";
-  modal.style.display = "flex";
-  modal.style.justifyContent = "center";
-  modal.style.alignItems = "center";
-  modal.style.zIndex = "1000";
+  document.getElementById("modalDetalhes").innerHTML = `
+    <div class="modal-content">
+      <h2>Detalhes</h2>
+      <p><b>Destinatário:</b> ${e.destinatario}</p>
+      <p><b>Status:</b> ${e.entregue ? "Entregue" : "Pendente"}</p>
+      ${e.entrega ? `
+        <p><b>Recebido por:</b> ${e.entrega.nome}</p>
+        <p><b>Documento:</b> ${e.entrega.documento}</p>
+        <img src="${e.entrega.assinatura}" style="width:100%">
+      ` : ""}
+      <button onclick="fecharModal()">Fechar</button>
+    </div>
+  `;
+  document.getElementById("modalDetalhes").style.display = "flex";
+}
 
-  modal.innerHTML = `
-    <div style="background:#fff;padding:20px;border-radius:10px;max-width:600px;width:90%;max-height:90%;overflow:auto;">
-      <h2>Detalhes da Encomenda ${e.id}</h2>
-      <p><strong>Rastreio:</strong> ${e.rastreio}</p>
-      <p><strong>Destinatário:</strong> ${e.destinatario}</p>
-      <p><strong>Apto:</strong> ${e.apartamento}</p>
-      <p><strong>Bloco:</strong> ${e.bloco}</p>
-      <p><strong>Transportadora:</strong> ${e.transportadora}</p>
-      <p><strong>Funcionário:</strong> ${e.funcionario}</p>
-      <p><strong>Documento:</strong> ${e.documentoFuncionario}</p>
-      <p><strong>Data Cadastro:</strong> ${new Date
+// ====== PDF ======
+function gerarPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const lista = JSON.parse(localStorage.getItem("encomendas")) || [];
+  let y = 10;
+
+  lista.forEach(e => {
+    doc.text(`ID: ${e.id}`, 10, y); y+=6;
+    doc.text(`Destinatário: ${e.destinatario}`, 10, y); y+=6;
+
+    if (e.entrega) {
+      doc.text(`Recebido por: ${e.entrega.nome}`, 10, y); y+=6;
+      doc.addImage(e.entrega.assinatura, "PNG", 10, y, 60, 30);
+      y+=40;
+    }
+    y+=10;
+  });
+
+  doc.save("encomendas.pdf");
+}
