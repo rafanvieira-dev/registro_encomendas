@@ -1,15 +1,54 @@
-let assinaturaPad;
+// ======================
+// UTIL
+// ======================
+function gerarId() {
+  return "ENC-" + Date.now();
+}
 
-// ====== ENTREGA ======
-document.addEventListener("DOMContentLoaded", () => {
-  carregarPendentes();
-  carregarConsulta();
-});
+function obterEncomendas() {
+  return JSON.parse(localStorage.getItem("encomendas")) || [];
+}
+
+function salvarEncomendas(lista) {
+  localStorage.setItem("encomendas", JSON.stringify(lista));
+}
+
+// ======================
+// CADASTRO
+// ======================
+function cadastrarEncomenda(dados) {
+  const lista = obterEncomendas();
+
+  lista.push({
+    id: gerarId(),
+    rastreio: dados.rastreio,
+    destinatario: dados.destinatario,
+    apartamento: dados.apartamento,
+    bloco: dados.bloco,
+    transportadora: dados.transportadora,
+    funcionario: dados.funcionario,
+    documentoFuncionario: dados.documentoFuncionario,
+    dataHoraCadastro: new Date().toISOString(),
+    entregue: false,
+    entrega: null
+  });
+
+  salvarEncomendas(lista);
+  alert("Encomenda cadastrada!");
+  window.location.href = "consulta.html";
+}
+
+// ======================
+// REGISTRAR ENTREGA
+// ======================
+let assinaturaPad = null;
+let encomendaSelecionada = null;
 
 function carregarPendentes() {
-  const lista = JSON.parse(localStorage.getItem("encomendas")) || [];
+  const lista = obterEncomendas();
   const tbody = document.getElementById("listaPendentes");
   if (!tbody) return;
+
   tbody.innerHTML = "";
 
   lista.filter(e => !e.entregue).forEach(e => {
@@ -20,51 +59,64 @@ function carregarPendentes() {
         <td>${e.destinatario}</td>
         <td>${e.apartamento}</td>
         <td>${e.bloco}</td>
-        <td><button onclick="abrirEntrega('${e.id}')">Registrar</button></td>
+        <td>
+          <button onclick="abrirEntrega('${e.id}')">Registrar entrega</button>
+        </td>
       </tr>
     `;
   });
 }
 
 function abrirEntrega(id) {
+  const lista = obterEncomendas();
+  encomendaSelecionada = lista.find(e => e.id === id);
+
   document.getElementById("modalEntrega").style.display = "flex";
-  document.getElementById("entregaId").value = id;
 
   const canvas = document.getElementById("assinatura");
   assinaturaPad = new SignaturePad(canvas);
-}
-
-function limparAssinatura() {
   assinaturaPad.clear();
 }
 
-function fecharModal() {
-  document.querySelectorAll(".modal").forEach(m => m.style.display = "none");
+function limparAssinatura() {
+  if (assinaturaPad) assinaturaPad.clear();
 }
 
 function confirmarEntrega() {
-  const lista = JSON.parse(localStorage.getItem("encomendas")) || [];
-  const id = document.getElementById("entregaId").value;
+  if (!encomendaSelecionada) return;
 
-  const encomenda = lista.find(e => e.id === id);
-  encomenda.entregue = true;
-  encomenda.entrega = {
-    nome: document.getElementById("nomeRecebedor").value,
-    documento: document.getElementById("docRecebedor").value,
+  const nome = document.getElementById("nomeRecebedor").value;
+  const doc = document.getElementById("docRecebedor").value;
+
+  if (!nome || !doc || assinaturaPad.isEmpty()) {
+    alert("Preencha todos os campos e assine.");
+    return;
+  }
+
+  const lista = obterEncomendas();
+  const index = lista.findIndex(e => e.id === encomendaSelecionada.id);
+
+  lista[index].entregue = true;
+  lista[index].entrega = {
+    nome,
+    documento: doc,
     assinatura: assinaturaPad.toDataURL(),
     dataHora: new Date().toISOString()
   };
 
-  localStorage.setItem("encomendas", JSON.stringify(lista));
-  alert("Entrega registrada!");
-  location.reload();
+  salvarEncomendas(lista);
+  alert("Entrega registrada com sucesso!");
+  window.location.reload();
 }
 
-// ====== CONSULTA ======
+// ======================
+// CONSULTA
+// ======================
 function carregarConsulta() {
-  const lista = JSON.parse(localStorage.getItem("encomendas")) || [];
+  const lista = obterEncomendas();
   const tbody = document.getElementById("tabelaConsulta");
   if (!tbody) return;
+
   tbody.innerHTML = "";
 
   lista.forEach(e => {
@@ -75,37 +127,49 @@ function carregarConsulta() {
         <td>${e.destinatario}</td>
         <td>${e.apartamento}</td>
         <td>${e.bloco}</td>
-        <td><button onclick="detalhes('${e.id}')">Detalhes</button></td>
+        <td>
+          <button onclick="verDetalhes('${e.id}')">Detalhes</button>
+        </td>
       </tr>
     `;
   });
 }
 
-function detalhes(id) {
-  const lista = JSON.parse(localStorage.getItem("encomendas")) || [];
+function verDetalhes(id) {
+  const lista = obterEncomendas();
   const e = lista.find(x => x.id === id);
 
-  document.getElementById("modalDetalhes").innerHTML = `
+  const modal = document.getElementById("modalDetalhes");
+  modal.innerHTML = `
     <div class="modal-content">
-      <h2>Detalhes</h2>
+      <h2>Encomenda ${e.id}</h2>
       <p><b>Destinatário:</b> ${e.destinatario}</p>
       <p><b>Status:</b> ${e.entregue ? "Entregue" : "Pendente"}</p>
+
       ${e.entrega ? `
         <p><b>Recebido por:</b> ${e.entrega.nome}</p>
         <p><b>Documento:</b> ${e.entrega.documento}</p>
-        <img src="${e.entrega.assinatura}" style="width:100%">
+        <img src="${e.entrega.assinatura}" style="width:100%;border:1px solid #ccc">
       ` : ""}
+
       <button onclick="fecharModal()">Fechar</button>
     </div>
   `;
-  document.getElementById("modalDetalhes").style.display = "flex";
+
+  modal.style.display = "flex";
 }
 
-// ====== PDF ======
+function fecharModal() {
+  document.querySelectorAll(".modal").forEach(m => m.style.display = "none");
+}
+
+// ======================
+// PDF
+// ======================
 function gerarPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
-  const lista = JSON.parse(localStorage.getItem("encomendas")) || [];
+  const lista = obterEncomendas();
   let y = 10;
 
   lista.forEach(e => {
@@ -120,5 +184,13 @@ function gerarPDF() {
     y+=10;
   });
 
-  doc.save("encomendas.pdf");
+  doc.save("relatorio-encomendas.pdf");
 }
+
+// ======================
+// AUTOLOAD
+// ======================
+document.addEventListener("DOMContentLoaded", () => {
+  carregarPendentes();
+  carregarConsulta();
+});
