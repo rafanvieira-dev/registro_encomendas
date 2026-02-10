@@ -2,66 +2,51 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Recebimento de Encomenda</title>
+  <title>Registrar Entrega</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>📦 Recebimento de Encomenda</h1>
+<h1>📦 Registrar Entrega</h1>
 
-<!-- Exibir apenas se houver encomenda registrada -->
-<div id="listaEncomendas">
-  <h2>Encomendas Pendentes</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Rastreio</th>
-        <th>Destinatário</th>
-        <th>Apto</th>
-        <th>Bloco</th>
-        <th>Ação</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Dados das encomendas -->
-    </tbody>
-  </table>
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Rastreio</th>
+      <th>Destinatário</th>
+      <th>Apto</th>
+      <th>Bloco</th>
+      <th>Ação</th>
+    </tr>
+  </thead>
+  <tbody id="listaPendentes"></tbody>
+</table>
+
+<!-- POP-UP ENTREGA -->
+<div id="modalEntrega" class="modal">
+  <div class="modal-content">
+    <h2>Registrar Entrega</h2>
+
+    <input type="hidden" id="entregaId">
+
+    <label>Nome de quem recebeu</label>
+    <input type="text" id="nomeRecebedor">
+
+    <label>Documento</label>
+    <input type="text" id="docRecebedor">
+
+    <label>Assinatura</label>
+    <canvas id="assinatura" width="300" height="150"></canvas>
+    <button onclick="limparAssinatura()">Limpar</button>
+
+    <br><br>
+    <button onclick="confirmarEntrega()">Salvar</button>
+    <button onclick="fecharModal()">Cancelar</button>
+  </div>
 </div>
 
-<!-- Formulário de Registro de Entrega -->
-<div id="registroEntrega" style="display:none;">
-  <form id="formEntrega">
-    <label for="retirante">Nome de quem retirou:</label>
-    <input type="text" id="retirante" name="retirante" required>
-
-    <label for="documentoRetirante">Documento:</label>
-    <input type="text" id="documentoRetirante" name="documentoRetirante" required>
-
-    <label for="dataHoraEntrega">Data e Hora:</label>
-    <input type="datetime-local" id="dataHoraEntrega" name="dataHoraEntrega" required>
-
-    <!-- Campo de assinatura -->
-    <div class="campo">
-      <label>Assinatura do Recebedor</label>
-      <canvas id="assinatura" style="border:1px solid #ccc; width:100%; height:200px;"></canvas>
-      <button type="button" onclick="limparAssinatura()">Limpar</button>
-    </div>
-
-    <button type="button" onclick="registrarEntrega()">Registrar Entrega</button>
-  </form>
-</div>
-
-<a href="consulta.html">⬅ Voltar para Consulta</a>
-
-<!-- jsPDF (para PDF, caso queira) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-<!-- Signature Pad -->
 <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
-
-<!-- Script principal -->
 <script src="script.js"></script>
-
 </body>
 </html>
