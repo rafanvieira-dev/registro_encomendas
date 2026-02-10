@@ -10,9 +10,21 @@
 <h1>📦 Recebimento de Encomenda</h1>
 
 <form id="formEntrega">
+  <!-- ID da encomenda -->
   <label for="idEncomenda">ID da Encomenda:</label>
   <input type="text" id="idEncomenda" name="idEncomenda" required>
-  
+
+  <!-- Campos do recebimento -->
+  <label for="retirante">Nome de quem retirou:</label>
+  <input type="text" id="retirante" name="retirante" required>
+
+  <label for="documentoRetirante">Documento:</label>
+  <input type="text" id="documentoRetirante" name="documentoRetirante" required>
+
+  <label for="dataHoraEntrega">Data e Hora:</label>
+  <input type="datetime-local" id="dataHoraEntrega" name="dataHoraEntrega" required>
+
+  <!-- Campo de assinatura -->
   <div class="campo">
     <label>Assinatura do Recebedor</label>
     <canvas id="assinatura" style="border:1px solid #ccc; width:100%; height:200px;"></canvas>
@@ -24,7 +36,7 @@
 
 <a href="consulta.html">⬅ Voltar para Consulta</a>
 
-<!-- jsPDF -->
+<!-- jsPDF (para PDF, caso queira) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <!-- Signature Pad -->
