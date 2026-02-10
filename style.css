@@ -1,110 +1,153 @@
-/* Reset básico */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
-}
+/* ===========================
+   ESTILOS GERAIS
+   =========================== */
 
 body {
-  background-color: #f4f6f8;
-  padding: 20px;
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  background: #f9f9f9;
   color: #333;
 }
 
 h1 {
   text-align: center;
+  color: #1a73e8;
   margin-bottom: 20px;
-  color: #1f2937;
 }
 
 form {
-  background-color: #fff;
+  background: #fff;
   padding: 20px;
   border-radius: 10px;
-  max-width: 1000px;
+  max-width: 900px;
   margin: 0 auto 20px auto;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.linha {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-bottom: 15px;
-}
-
-.campo {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-width: 180px;
-}
-
-label {
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-input, select {
-  padding: 8px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
 button {
-  background-color: #2563eb;
+  background-color: #1a73e8;
   color: #fff;
-  padding: 10px 20px;
   border: none;
-  border-radius: 5px;
+  padding: 10px 20px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 15px;
-  transition: background-color 0.2s ease;
+  font-size: 1rem;
+  transition: background 0.3s;
 }
 
 button:hover {
-  background-color: #1e40af;
+  background-color: #155ab6;
 }
 
 a {
+  display: inline-block;
+  margin-top: 15px;
+  color: #1a73e8;
   text-decoration: none;
-  color: #2563eb;
-  font-weight: bold;
 }
 
 a:hover {
   text-decoration: underline;
 }
 
+/* ===========================
+   FORMULÁRIOS - LINHAS E CAMPOS
+   =========================== */
+
+.linha {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+.campo {
+  flex: 1 1 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.campo label {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.campo input {
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+/* ===========================
+   TABELAS
+   =========================== */
+
 table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 20px;
-  background-color: #fff;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 th, td {
   padding: 10px;
+  border: 1px solid #ddd;
   text-align: left;
-  border-bottom: 1px solid #ddd;
 }
 
 th {
-  background-color: #2563eb;
+  background-color: #1a73e8;
   color: #fff;
 }
 
 tr:nth-child(even) {
-  background-color: #f9fafb;
+  background-color: #f2f2f2;
 }
+
+td button {
+  padding: 6px 12px;
+  font-size: 0.9rem;
+}
+
+/* ===========================
+   MODAL POP-UP
+   =========================== */
+
+div[style*="position: fixed"] img {
+  max-width: 100%;
+  border-radius: 5px;
+}
+
+/* ===========================
+   RESPONSIVO
+   =========================== */
 
 @media (max-width: 768px) {
   .linha {
     flex-direction: column;
+  }
+
+  .campo {
+    flex: 1 1 100%;
+  }
+
+  table, th, td {
+    font-size: 0.9rem;
+  }
+
+  button {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  table, th, td {
+    font-size: 0.8rem;
   }
 }
