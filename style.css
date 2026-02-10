@@ -1,153 +1,70 @@
-/* ===========================
-   ESTILOS GERAIS
-   =========================== */
-
 body {
   font-family: Arial, sans-serif;
-  margin: 20px;
-  background: #f9f9f9;
-  color: #333;
+  margin: 0;
+  padding: 0;
 }
 
 h1 {
   text-align: center;
-  color: #1a73e8;
-  margin-bottom: 20px;
+  margin: 20px 0;
 }
 
-form {
-  background: #fff;
-  padding: 20px;
-  border-radius: 10px;
-  max-width: 900px;
-  margin: 0 auto 20px auto;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+form, table {
+  width: 80%;
+  margin: 0 auto;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 button {
-  background-color: #1a73e8;
-  color: #fff;
+  padding: 10px 15px;
   border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
+  background-color: #4CAF50;
+  color: white;
   cursor: pointer;
-  font-size: 1rem;
-  transition: background 0.3s;
+  border-radius: 4px;
 }
 
 button:hover {
-  background-color: #155ab6;
+  background-color: #45a049;
 }
-
-a {
-  display: inline-block;
-  margin-top: 15px;
-  color: #1a73e8;
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
-/* ===========================
-   FORMULÁRIOS - LINHAS E CAMPOS
-   =========================== */
-
-.linha {
-  display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
-  margin-bottom: 15px;
-}
-
-.campo {
-  flex: 1 1 200px;
-  display: flex;
-  flex-direction: column;
-}
-
-.campo label {
-  margin-bottom: 5px;
-  font-weight: bold;
-}
-
-.campo input {
-  padding: 8px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
-}
-
-/* ===========================
-   TABELAS
-   =========================== */
 
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 20px;
+}
+
+table, th, td {
+  border: 1px solid black;
 }
 
 th, td {
-  padding: 10px;
-  border: 1px solid #ddd;
+  padding: 8px;
   text-align: left;
 }
 
-th {
-  background-color: #1a73e8;
-  color: #fff;
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding-top: 60px;
 }
 
-tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
-td button {
-  padding: 6px 12px;
-  font-size: 0.9rem;
-}
-
-/* ===========================
-   MODAL POP-UP
-   =========================== */
-
-div[style*="position: fixed"] img {
-  max-width: 100%;
+.modal-content {
+  background-color: #fff;
+  margin: 5% auto;
+  padding: 20px;
   border-radius: 5px;
-}
-
-/* ===========================
-   RESPONSIVO
-   =========================== */
-
-@media (max-width: 768px) {
-  .linha {
-    flex-direction: column;
-  }
-
-  .campo {
-    flex: 1 1 100%;
-  }
-
-  table, th, td {
-    font-size: 0.9rem;
-  }
-
-  button {
-    width: 100%;
-    padding: 10px;
-    font-size: 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  h1 {
-    font-size: 1.5rem;
-  }
-
-  table, th, td {
-    font-size: 0.8rem;
-  }
+  width: 80%;
 }
