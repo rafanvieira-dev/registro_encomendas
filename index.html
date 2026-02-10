@@ -2,41 +2,16 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cadastrar Encomenda</title>
+  <title>Controle de Encomendas</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <h1>📦 Controle de Encomendas</h1>
 
-<h1>📦 Cadastrar Encomenda</h1>
-
-<form id="formCadastro">
-  <label for="destinatario">Nome do Destinatário</label>
-  <input type="text" id="destinatario" required>
-
-  <label for="apartamento">Apartamento</label>
-  <input type="text" id="apartamento" required>
-
-  <label for="bloco">Bloco</label>
-  <input type="text" id="bloco" required>
-
-  <label for="rastreio">Número de Rastreio</label>
-  <input type="text" id="rastreio" required>
-
-  <label for="transportadora">Transportadora</label>
-  <input type="text" id="transportadora" required>
-
-  <label for="funcionario">Funcionário</label>
-  <input type="text" id="funcionario" required>
-
-  <label for="documentoFuncionario">Documento do Funcionário</label>
-  <input type="text" id="documentoFuncionario" required>
-
-  <button type="button" onclick="salvarCadastro()">Cadastrar</button>
-</form>
-
-<a href="consulta.html">📊 Consulta de Encomendas</a>
-
-<script src="script.js"></script>
+  <div style="max-width:400px;margin:0 auto; display:flex; flex-direction:column; gap:15px;">
+    <a href="cadastro.html"><button>Cadastrar Encomenda</button></a>
+    <a href="entrega.html"><button>Registrar Entrega</button></a>
+    <a href="consulta.html"><button>Consultar Encomendas</button></a>
+  </div>
 </body>
 </html>
