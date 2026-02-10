@@ -7,7 +7,9 @@
 </head>
 <body>
 
-<h1>📊 Consulta de Encomendas</h1>
+<h1>📋 Consulta de Encomendas</h1>
+
+<button onclick="gerarPDF()">📄 Baixar Relatório em PDF</button>
 
 <table>
   <thead>
@@ -20,11 +22,17 @@
       <th>Detalhes</th>
     </tr>
   </thead>
-  <tbody id="tabela"></tbody>
+  <tbody id="tabela">
+    <!-- Linhas geradas pelo script.js -->
+  </tbody>
 </table>
 
 <a href="index.html">⬅ Voltar</a>
 
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- Script principal -->
 <script src="script.js"></script>
 </body>
 </html>
