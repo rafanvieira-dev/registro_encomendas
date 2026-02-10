@@ -1,49 +1,46 @@
-// ======================
-// UTIL
-// ======================
+let assinaturaPad = null;
+let encomendaSelecionada = null;
+
+// Função para gerar ID automático
 function gerarId() {
   return "ENC-" + Date.now();
 }
 
-function obterEncomendas() {
-  return JSON.parse(localStorage.getItem("encomendas")) || [];
-}
-
+// Função para salvar encomenda no localStorage
 function salvarEncomendas(lista) {
   localStorage.setItem("encomendas", JSON.stringify(lista));
 }
 
-// ======================
-// CADASTRO
-// ======================
-function cadastrarEncomenda(dados) {
+// Função para obter encomendas do localStorage
+function obterEncomendas() {
+  return JSON.parse(localStorage.getItem("encomendas")) || [];
+}
+
+// Função para cadastrar encomenda
+function salvarCadastro() {
   const lista = obterEncomendas();
 
-  lista.push({
+  const nova = {
     id: gerarId(),
-    rastreio: dados.rastreio,
-    destinatario: dados.destinatario,
-    apartamento: dados.apartamento,
-    bloco: dados.bloco,
-    transportadora: dados.transportadora,
-    funcionario: dados.funcionario,
-    documentoFuncionario: dados.documentoFuncionario,
+    destinatario: document.getElementById("destinatario").value,
+    apartamento: document.getElementById("apartamento").value,
+    bloco: document.getElementById("bloco").value,
+    rastreio: document.getElementById("rastreio").value,
+    transportadora: document.getElementById("transportadora").value,
+    funcionario: document.getElementById("funcionario").value,
+    documentoFuncionario: document.getElementById("documentoFuncionario").value,
     dataHoraCadastro: new Date().toISOString(),
     entregue: false,
     entrega: null
-  });
+  };
 
+  lista.push(nova);
   salvarEncomendas(lista);
   alert("Encomenda cadastrada!");
   window.location.href = "consulta.html";
 }
 
-// ======================
-// REGISTRAR ENTREGA
-// ======================
-let assinaturaPad = null;
-let encomendaSelecionada = null;
-
+// Função para carregar encomendas pendentes
 function carregarPendentes() {
   const lista = obterEncomendas();
   const tbody = document.getElementById("listaPendentes");
@@ -67,10 +64,10 @@ function carregarPendentes() {
   });
 }
 
+// Função para abrir o modal de registro de entrega
 function abrirEntrega(id) {
   const lista = obterEncomendas();
   encomendaSelecionada = lista.find(e => e.id === id);
-
   document.getElementById("modalEntrega").style.display = "flex";
 
   const canvas = document.getElementById("assinatura");
@@ -78,10 +75,12 @@ function abrirEntrega(id) {
   assinaturaPad.clear();
 }
 
+// Função para limpar a assinatura
 function limparAssinatura() {
   if (assinaturaPad) assinaturaPad.clear();
 }
 
+// Função para confirmar a entrega
 function confirmarEntrega() {
   if (!encomendaSelecionada) return;
 
@@ -109,9 +108,7 @@ function confirmarEntrega() {
   window.location.reload();
 }
 
-// ======================
-// CONSULTA
-// ======================
+// Função para carregar a lista de encomendas na consulta
 function carregarConsulta() {
   const lista = obterEncomendas();
   const tbody = document.getElementById("tabelaConsulta");
@@ -135,6 +132,7 @@ function carregarConsulta() {
   });
 }
 
+// Função para ver os detalhes da encomenda
 function verDetalhes(id) {
   const lista = obterEncomendas();
   const e = lista.find(x => x.id === id);
@@ -159,13 +157,12 @@ function verDetalhes(id) {
   modal.style.display = "flex";
 }
 
+// Função para fechar o modal
 function fecharModal() {
   document.querySelectorAll(".modal").forEach(m => m.style.display = "none");
 }
 
-// ======================
-// PDF
-// ======================
+// Função para gerar o PDF
 function gerarPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
@@ -187,9 +184,7 @@ function gerarPDF() {
   doc.save("relatorio-encomendas.pdf");
 }
 
-// ======================
-// AUTOLOAD
-// ======================
+// Carregar a página corretamente
 document.addEventListener("DOMContentLoaded", () => {
   carregarPendentes();
   carregarConsulta();
