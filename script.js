@@ -26,31 +26,46 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // =====================
-// ENTREGAS
+// REGISTRAR ENTREGA
 // =====================
 
-// Inicializa o canvas de assinatura
-let canvas = document.getElementById("assinatura");
-let signaturePad = new SignaturePad(canvas);
+function carregarEncomendasPendentes() {
+  const lista = JSON.parse(localStorage.getItem("encomendas")) || [];
+  const tbody = document.querySelector("#listaEncomendas tbody");
+  if (!tbody) return;
+  tbody.innerHTML = "";
 
-function ajustarCanvas() {
-  if (!canvas) return;
-  const ratio = Math.max(window.devicePixelRatio || 1, 1);
-  canvas.width = canvas.offsetWidth * ratio;
-  canvas.height = canvas.offsetHeight * ratio;
-  canvas.getContext("2d").scale(ratio, ratio);
+  lista.forEach(e => {
+    if (!e.entregue) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${e.id}</td>
+        <td>${e.rastreio}</td>
+        <td>${e.destinatario}</td>
+        <td>${e.apartamento}</td>
+        <td>${e.bloco}</td>
+        <td><button onclick='mostrarFormularioEntrega("${e.id}")'>Registrar Entrega</button></td>
+      `;
+      tbody.appendChild(tr);
+    }
+  });
 }
-window.addEventListener("resize", ajustarCanvas);
-ajustarCanvas();
 
-function limparAssinatura() {
-  if (signaturePad) signaturePad.clear();
+function mostrarFormularioEntrega(idEncomenda) {
+  // Exibe o formulário de entrega e a assinatura somente para a encomenda selecionada
+  const formEntrega = document.getElementById("registroEntrega");
+  formEntrega.style.display = "block";
+  document.getElementById("idEncomendaEntrega").value = idEncomenda;
+  
+  // Inicializa a área de assinatura no canvas
+  let canvas = document.getElementById("assinatura");
+  signaturePad = new SignaturePad(canvas);
+  signaturePad.clear();
 }
 
-// Função para registrar a entrega, mantendo todos os campos
 function registrarEntrega() {
   let lista = JSON.parse(localStorage.getItem("encomendas")) || [];
-  const encomendaId = document.getElementById("idEncomenda").value;
+  const encomendaId = document.getElementById("idEncomendaEntrega").value;
   const encomenda = lista.find(e => e.id === encomendaId);
 
   if (!encomenda) {
@@ -125,17 +140,4 @@ function mostrarDetalhes(id) {
       <p><strong>Transportadora:</strong> ${e.transportadora}</p>
       <p><strong>Funcionário:</strong> ${e.funcionario}</p>
       <p><strong>Documento:</strong> ${e.documentoFuncionario}</p>
-      <p><strong>Data Cadastro:</strong> ${new Date(e.dataHoraCadastro).toLocaleString("pt-BR")}</p>
-      <p><strong>Status:</strong> ${e.entregue ? "✅ Entregue" : "📦 Pendente"}</p>
-      ${e.entrega.retirante ? `<p><strong>Entregue por:</strong> ${e.entrega.retirante}</p>` : ""}
-      ${e.entrega.documento ? `<p><strong>Documento:</strong> ${e.entrega.documento}</p>` : ""}
-      ${e.entrega.dataHora ? `<p><strong>Data/Hora Entrega:</strong> ${new Date(e.entrega.dataHora).toLocaleString("pt-BR")}</p>` : ""}
-      ${e.foto ? `<img src="${e.foto}" style="max-width:100%;border-radius:5px;margin-top:10px;">` : ""}
-      ${e.entrega.assinatura ? `<p><strong>Assinatura:</strong><br><img src="${e.entrega.assinatura}" style="max-width:100%;border-radius:5px;margin-top:10px;"></p>` : ""}
-      <button id="fecharModal" style="margin-top:15px;padding:10px 20px;">Fechar</button>
-    </div>
-  `;
-
-  document.body.appendChild(modal);
-  document.getElementById("fecharModal").onclick = () => modal.remove();
-}
+      <p><strong>Data Cadastro:</strong> ${new Date
