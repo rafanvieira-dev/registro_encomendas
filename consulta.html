@@ -2,15 +2,12 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Consulta de Encomendas</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <h1>📊 Consulta de Encomendas</h1>
-
-<button onclick="gerarPDF()">📄 Baixar PDF</button>
 
 <table>
   <thead>
@@ -20,15 +17,15 @@
       <th>Destinatário</th>
       <th>Apto</th>
       <th>Bloco</th>
+      <th>Status</th>
       <th>Detalhes</th>
     </tr>
   </thead>
-  <tbody id="tabelaConsulta"></tbody>
+  <tbody id="tabela"></tbody>
 </table>
 
-<div id="modalDetalhes" class="modal"></div>
+<a href="index.html">⬅ Voltar</a>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
