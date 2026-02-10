@@ -175,3 +175,55 @@ function mostrarDetalhes(id) {
   document.body.appendChild(modal);
   document.getElementById("fecharModal").onclick = () => modal.remove();
 }
+
+// =====================
+// GERAR PDF COM TODOS OS REGISTROS
+// =====================
+async function gerarPDF() {
+  const { jsPDF } = window.jspdf; 
+  const lista = JSON.parse(localStorage.getItem("encomendas")) || [];
+
+  if(lista.length === 0) {
+    alert("Nenhuma encomenda para gerar PDF!");
+    return;
+  }
+
+  const doc = new jsPDF();
+  doc.setFontSize(18);
+  doc.text("📦 Relatório de Encomendas", 105, 15, { align: "center" });
+
+  let y = 25;
+  const margemEsq = 10;
+  const linhaAltura = 10;
+
+  lista.forEach((e, i) => {
+    doc.setFontSize(12);
+    doc.text(`Encomenda ${i+1} - ID: ${e.id}`, margemEsq, y); y += linhaAltura;
+    doc.text(`Rastreio: ${e.rastreio}`, margemEsq, y); y += linhaAltura;
+    doc.text(`Destinatário: ${e.destinatario}`, margemEsq, y); y += linhaAltura;
+    doc.text(`Apto: ${e.apartamento}  Bloco: ${e.bloco}`, margemEsq, y); y += linhaAltura;
+    doc.text(`Transportadora: ${e.transportadora}`, margemEsq, y); y += linhaAltura;
+    doc.text(`Funcionário: ${e.funcionario}  Documento: ${e.documentoFuncionario}`, margemEsq, y); y += linhaAltura;
+    doc.text(`Data/Hora Cadastro: ${new Date(e.dataHoraCadastro).toLocaleString("pt-BR")}`, margemEsq, y); y += linhaAltura;
+    doc.text(`Status: ${e.entregue ? "✅ Entregue" : "📦 Pendente"}`, margemEsq, y); y += linhaAltura;
+
+    if(e.entregue) {
+      doc.text(`Entregue por: ${e.entrega.retirante}  Documento: ${e.entrega.documento}`, margemEsq, y); y += linhaAltura;
+      doc.text(`Data/Hora Entrega: ${new Date(e.entrega.dataHora).toLocaleString("pt-BR")}`, margemEsq, y); y += linhaAltura;
+    }
+
+    if(e.foto) {
+      try {
+        doc.addImage(e.foto, 'JPEG', margemEsq, y, 50, 50);
+        y += 55;
+      } catch(err) {
+        console.log("Erro ao adicionar imagem no PDF", err);
+      }
+    } else { y += 5; }
+
+    y += 5;
+    if(y > 270) { doc.addPage(); y = 20; }
+  });
+
+  doc.save("encomendas_relatorio.pdf");
+}
