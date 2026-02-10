@@ -1,191 +1,177 @@
-let assinaturaPad = null;
-let encomendaSelecionada = null;
+// =====================
+// FUNÇÕES ÚTEIS
+// =====================
 
-// Função para gerar ID automático
-function gerarId() {
+// Gerar ID único
+function gerarIdEncomenda() {
   return "ENC-" + Date.now();
 }
 
-// Função para salvar encomenda no localStorage
-function salvarEncomendas(lista) {
-  localStorage.setItem("encomendas", JSON.stringify(lista));
+// Converter imagem para Base64
+function converterParaBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+    reader.readAsDataURL(file);
+  });
 }
 
-// Função para obter encomendas do localStorage
-function obterEncomendas() {
-  return JSON.parse(localStorage.getItem("encomendas")) || [];
+// =====================
+// CADASTRO DE ENCOMENDAS
+// =====================
+document.addEventListener("DOMContentLoaded", () => {
+  const idCampo = document.getElementById("idEncomenda");
+  if (idCampo) idCampo.value = gerarIdEncomenda();
+
+  // Inicializa entrega e consulta, se estiver nas respectivas páginas
+  if (document.getElementById("listaEncomendas")) carregarEncomendasPendentes();
+  if (document.getElementById("tabela")) mostrarConsulta();
+});
+
+const formCadastro = document.getElementById("formCadastro");
+if (formCadastro) {
+  formCadastro.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    let fotoBase64 = null;
+    const arquivo = document.getElementById("foto").files[0];
+    if (arquivo) fotoBase64 = await converterParaBase64(arquivo);
+
+    const encomenda = {
+      id: document.getElementById("idEncomenda").value,
+      rastreio: document.getElementById("rastreio").value,
+      destinatario: document.getElementById("destinatario").value,
+      apartamento: document.getElementById("apartamento").value,
+      bloco: document.getElementById("bloco").value,
+      transportadora: document.getElementById("transportadora").value,
+      funcionario: document.getElementById("funcionario").value,
+      documentoFuncionario: document.getElementById("documento").value,
+      dataHoraCadastro: document.getElementById("dataHora").value,
+      foto: fotoBase64,
+      entregue: false,
+      entrega: { retirante: "", documento: "", dataHora: "" }
+    };
+
+    let lista = JSON.parse(localStorage.getItem("encomendas")) || [];
+    lista.push(encomenda);
+    localStorage.setItem("encomendas", JSON.stringify(lista));
+
+    alert("Encomenda cadastrada com sucesso!");
+    window.location.href = "entrega.html"; // redireciona automaticamente
+  });
 }
 
-// Função para cadastrar encomenda
-function salvarCadastro() {
-  const lista = obterEncomendas();
-
-  const nova = {
-    id: gerarId(),
-    destinatario: document.getElementById("destinatario").value,
-    apartamento: document.getElementById("apartamento").value,
-    bloco: document.getElementById("bloco").value,
-    rastreio: document.getElementById("rastreio").value,
-    transportadora: document.getElementById("transportadora").value,
-    funcionario: document.getElementById("funcionario").value,
-    documentoFuncionario: document.getElementById("documentoFuncionario").value,
-    dataHoraCadastro: new Date().toISOString(),
-    entregue: false,
-    entrega: null
-  };
-
-  lista.push(nova);
-  salvarEncomendas(lista);
-  alert("Encomenda cadastrada!");
-  window.location.href = "consulta.html";
-}
-
-// Função para carregar encomendas pendentes
-function carregarPendentes() {
-  const lista = obterEncomendas();
-  const tbody = document.getElementById("listaPendentes");
+// =====================
+// ENTREGAS
+// =====================
+function carregarEncomendasPendentes() {
+  const lista = JSON.parse(localStorage.getItem("encomendas")) || [];
+  const tbody = document.getElementById("listaEncomendas");
   if (!tbody) return;
-
   tbody.innerHTML = "";
 
-  lista.filter(e => !e.entregue).forEach(e => {
-    tbody.innerHTML += `
-      <tr>
+  lista.forEach(e => {
+    if (!e.entregue) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
         <td>${e.id}</td>
         <td>${e.rastreio}</td>
         <td>${e.destinatario}</td>
         <td>${e.apartamento}</td>
         <td>${e.bloco}</td>
-        <td>
-          <button onclick="abrirEntrega('${e.id}')">Registrar entrega</button>
-        </td>
-      </tr>
-    `;
+        <td>${e.entrega.retirante || ""}</td>
+        <td>${e.entrega.documento || ""}</td>
+        <td>${e.entrega.dataHora ? new Date(e.entrega.dataHora).toLocaleString("pt-BR") : ""}</td>
+        <td><button onclick="registrarEntrega('${e.id}')">Registrar Entrega</button></td>
+      `;
+      tbody.appendChild(tr);
+    }
   });
 }
 
-// Função para abrir o modal de registro de entrega
-function abrirEntrega(id) {
-  const lista = obterEncomendas();
-  encomendaSelecionada = lista.find(e => e.id === id);
-  document.getElementById("modalEntrega").style.display = "flex";
+function registrarEntrega(idEncomenda) {
+  let lista = JSON.parse(localStorage.getItem("encomendas")) || [];
+  const e = lista.find(en => en.id === idEncomenda);
+  if (!e) return;
 
-  const canvas = document.getElementById("assinatura");
-  assinaturaPad = new SignaturePad(canvas);
-  assinaturaPad.clear();
+  e.entrega.retirante = prompt("Nome de quem retirou:") || "";
+  e.entrega.documento = prompt("Documento:") || "";
+  e.entrega.dataHora = new Date().toISOString();
+  e.entregue = true;
+
+  localStorage.setItem("encomendas", JSON.stringify(lista));
+  carregarEncomendasPendentes();
 }
 
-// Função para limpar a assinatura
-function limparAssinatura() {
-  if (assinaturaPad) assinaturaPad.clear();
-}
+// =====================
+// CONSULTA ENCOMENDAS
+// =====================
+function mostrarConsulta() {
+  const lista = JSON.parse(localStorage.getItem("encomendas")) || [];
+  const tbody = document.getElementById("tabela");
+  if (!tbody) return;
+  tbody.innerHTML = "";
 
-// Função para confirmar a entrega
-function confirmarEntrega() {
-  if (!encomendaSelecionada) return;
-
-  const nome = document.getElementById("nomeRecebedor").value;
-  const doc = document.getElementById("docRecebedor").value;
-
-  if (!nome || !doc || assinaturaPad.isEmpty()) {
-    alert("Preencha todos os campos e assine.");
+  if (lista.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6">Nenhuma encomenda registrada</td></tr>`;
     return;
   }
 
-  const lista = obterEncomendas();
-  const index = lista.findIndex(e => e.id === encomendaSelecionada.id);
-
-  lista[index].entregue = true;
-  lista[index].entrega = {
-    nome,
-    documento: doc,
-    assinatura: assinaturaPad.toDataURL(),
-    dataHora: new Date().toISOString()
-  };
-
-  salvarEncomendas(lista);
-  alert("Entrega registrada com sucesso!");
-  window.location.reload();
-}
-
-// Função para carregar a lista de encomendas na consulta
-function carregarConsulta() {
-  const lista = obterEncomendas();
-  const tbody = document.getElementById("tabelaConsulta");
-  if (!tbody) return;
-
-  tbody.innerHTML = "";
-
   lista.forEach(e => {
-    tbody.innerHTML += `
-      <tr>
-        <td>${e.id}</td>
-        <td>${e.rastreio}</td>
-        <td>${e.destinatario}</td>
-        <td>${e.apartamento}</td>
-        <td>${e.bloco}</td>
-        <td>
-          <button onclick="verDetalhes('${e.id}')">Detalhes</button>
-        </td>
-      </tr>
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${e.id}</td>
+      <td>${e.rastreio}</td>
+      <td>${e.destinatario}</td>
+      <td>${e.apartamento}</td>
+      <td>${e.bloco}</td>
+      <td><button onclick='mostrarDetalhes("${e.id}")'>Detalhes</button></td>
     `;
+    tbody.appendChild(tr);
   });
 }
 
-// Função para ver os detalhes da encomenda
-function verDetalhes(id) {
-  const lista = obterEncomendas();
-  const e = lista.find(x => x.id === id);
+// =====================
+// DETALHES EM POP-UP
+// =====================
+function mostrarDetalhes(id) {
+  const lista = JSON.parse(localStorage.getItem("encomendas")) || [];
+  const e = lista.find(en => en.id === id);
+  if (!e) return alert("Encomenda não encontrada.");
 
-  const modal = document.getElementById("modalDetalhes");
+  const modal = document.createElement("div");
+  modal.style.position = "fixed";
+  modal.style.top = "0";
+  modal.style.left = "0";
+  modal.style.width = "100%";
+  modal.style.height = "100%";
+  modal.style.background = "rgba(0,0,0,0.7)";
+  modal.style.display = "flex";
+  modal.style.justifyContent = "center";
+  modal.style.alignItems = "center";
+  modal.style.zIndex = "1000";
+
   modal.innerHTML = `
-    <div class="modal-content">
-      <h2>Encomenda ${e.id}</h2>
-      <p><b>Destinatário:</b> ${e.destinatario}</p>
-      <p><b>Status:</b> ${e.entregue ? "Entregue" : "Pendente"}</p>
-
-      ${e.entrega ? `
-        <p><b>Recebido por:</b> ${e.entrega.nome}</p>
-        <p><b>Documento:</b> ${e.entrega.documento}</p>
-        <img src="${e.entrega.assinatura}" style="width:100%;border:1px solid #ccc">
-      ` : ""}
-
-      <button onclick="fecharModal()">Fechar</button>
+    <div style="background:#fff;padding:20px;border-radius:10px;max-width:600px;width:90%;max-height:90%;overflow:auto;">
+      <h2>Detalhes da Encomenda ${e.id}</h2>
+      <p><strong>Rastreio:</strong> ${e.rastreio}</p>
+      <p><strong>Destinatário:</strong> ${e.destinatario}</p>
+      <p><strong>Apto:</strong> ${e.apartamento}</p>
+      <p><strong>Bloco:</strong> ${e.bloco}</p>
+      <p><strong>Transportadora:</strong> ${e.transportadora}</p>
+      <p><strong>Funcionário:</strong> ${e.funcionario}</p>
+      <p><strong>Documento:</strong> ${e.documentoFuncionario}</p>
+      <p><strong>Data Cadastro:</strong> ${new Date(e.dataHoraCadastro).toLocaleString("pt-BR")}</p>
+      <p><strong>Status:</strong> ${e.entregue ? "✅ Entregue" : "📦 Pendente"}</p>
+      ${e.entrega.retirante ? `<p><strong>Entregue por:</strong> ${e.entrega.retirante}</p>` : ""}
+      ${e.entrega.documento ? `<p><strong>Documento:</strong> ${e.entrega.documento}</p>` : ""}
+      ${e.entrega.dataHora ? `<p><strong>Data/Hora Entrega:</strong> ${new Date(e.entrega.dataHora).toLocaleString("pt-BR")}</p>` : ""}
+      ${e.foto ? `<img src="${e.foto}" style="max-width:100%;border-radius:5px;margin-top:10px;">` : ""}
+      <button id="fecharModal" style="margin-top:15px;padding:10px 20px;">Fechar</button>
     </div>
   `;
 
-  modal.style.display = "flex";
+  document.body.appendChild(modal);
+  document.getElementById("fecharModal").onclick = () => modal.remove();
 }
-
-// Função para fechar o modal
-function fecharModal() {
-  document.querySelectorAll(".modal").forEach(m => m.style.display = "none");
-}
-
-// Função para gerar o PDF
-function gerarPDF() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  const lista = obterEncomendas();
-  let y = 10;
-
-  lista.forEach(e => {
-    doc.text(`ID: ${e.id}`, 10, y); y+=6;
-    doc.text(`Destinatário: ${e.destinatario}`, 10, y); y+=6;
-
-    if (e.entrega) {
-      doc.text(`Recebido por: ${e.entrega.nome}`, 10, y); y+=6;
-      doc.addImage(e.entrega.assinatura, "PNG", 10, y, 60, 30);
-      y+=40;
-    }
-    y+=10;
-  });
-
-  doc.save("relatorio-encomendas.pdf");
-}
-
-// Carregar a página corretamente
-document.addEventListener("DOMContentLoaded", () => {
-  carregarPendentes();
-  carregarConsulta();
-});
