@@ -2,13 +2,12 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Registrar Entrega</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>📦 Registrar Entrega</h1>
+<h1>📤 Registro de Entrega</h1>
 
 <table>
   <thead>
@@ -21,35 +20,11 @@
       <th>Ação</th>
     </tr>
   </thead>
-  <tbody id="listaPendentes"></tbody>
+  <tbody id="listaEncomendas"></tbody>
 </table>
 
-<!-- POP-UP ENTREGA -->
-<div id="modalEntrega" class="modal">
-  <div class="modal-content">
-    <h2>Registrar Entrega</h2>
+<a href="index.html">⬅ Voltar</a>
 
-    <input type="hidden" id="entregaId">
-
-    <label>Nome de quem recebeu</label>
-    <input type="text" id="nomeRecebedor">
-
-    <label>Documento</label>
-    <input type="text" id="docRecebedor">
-
-    <label>Assinatura</label>
-    <canvas id="assinatura" width="300" height="150"></canvas>
-    <button onclick="limparAssinatura()">Limpar</button>
-
-    <br><br>
-    <button onclick="confirmarEntrega()">Salvar</button>
-    <button onclick="fecharModal()">Cancelar</button>
-  </div>
-</div>
-
-<a href="consulta.html">⬅ Voltar</a>
-
-<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
