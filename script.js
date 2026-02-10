@@ -100,130 +100,52 @@ function registrarEntrega(idEncomenda) {
   e.entrega.dataHora = new Date().toISOString();
   e.entregue = true;
 
+  // Salvar assinatura antes de registrar a entrega
+  salvarAssinatura();
+
   localStorage.setItem("encomendas", JSON.stringify(lista));
   carregarEncomendasPendentes();
 }
 
 // =====================
-// CONSULTA ENCOMENDAS
+// ASSINATURA
 // =====================
-function mostrarConsulta() {
-  const lista = JSON.parse(localStorage.getItem("encomendas")) || [];
-  const tbody = document.getElementById("tabela");
-  if (!tbody) return;
-  tbody.innerHTML = "";
 
-  if (lista.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6">Nenhuma encomenda registrada</td></tr>`;
-    return;
-  }
+// Configuração do canvas para assinatura
+let canvas = document.getElementById("assinatura");
+let signaturePad = new SignaturePad(canvas);
 
-  lista.forEach(e => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${e.id}</td>
-      <td>${e.rastreio}</td>
-      <td>${e.destinatario}</td>
-      <td>${e.apartamento}</td>
-      <td>${e.bloco}</td>
-      <td><button onclick='mostrarDetalhes("${e.id}")'>Detalhes</button></td>
-    `;
-    tbody.appendChild(tr);
-  });
+// Ajustar o tamanho do canvas para dispositivos móveis
+function ajustarCanvas() {
+  const ratio = Math.max(window.devicePixelRatio || 1, 1);
+  canvas.width = canvas.offsetWidth * ratio;
+  canvas.height = canvas.offsetHeight * ratio;
+  canvas.getContext("2d").scale(ratio, ratio);
+}
+window.addEventListener("resize", ajustarCanvas);
+ajustarCanvas();
+
+// Função para limpar a assinatura
+function limparAssinatura() {
+  signaturePad.clear();
 }
 
-// =====================
-// DETALHES EM POP-UP
-// =====================
-function mostrarDetalhes(id) {
-  const lista = JSON.parse(localStorage.getItem("encomendas")) || [];
-  const e = lista.find(en => en.id === id);
-  if (!e) return alert("Encomenda não encontrada.");
+// Função para salvar a assinatura em Base64 (apenas no momento do recebimento)
+function salvarAssinatura() {
+  const assinaturaBase64 = signaturePad.isEmpty() ? null : signaturePad.toDataURL("image/png");
 
-  const modal = document.createElement("div");
-  modal.style.position = "fixed";
-  modal.style.top = "0";
-  modal.style.left = "0";
-  modal.style.width = "100%";
-  modal.style.height = "100%";
-  modal.style.background = "rgba(0,0,0,0.7)";
-  modal.style.display = "flex";
-  modal.style.justifyContent = "center";
-  modal.style.alignItems = "center";
-  modal.style.zIndex = "1000";
+  if (assinaturaBase64) {
+    // Aqui você pode salvar no objeto da encomenda
+    let lista = JSON.parse(localStorage.getItem("encomendas")) || [];
+    const encomendaId = document.getElementById("idEncomenda").value; // ID da encomenda a ser registrada
+    const encomenda = lista.find(e => e.id === encomendaId);
 
-  modal.innerHTML = `
-    <div style="background:#fff;padding:20px;border-radius:10px;max-width:600px;width:90%;max-height:90%;overflow:auto;">
-      <h2>Detalhes da Encomenda ${e.id}</h2>
-      <p><strong>Rastreio:</strong> ${e.rastreio}</p>
-      <p><strong>Destinatário:</strong> ${e.destinatario}</p>
-      <p><strong>Apto:</strong> ${e.apartamento}</p>
-      <p><strong>Bloco:</strong> ${e.bloco}</p>
-      <p><strong>Transportadora:</strong> ${e.transportadora}</p>
-      <p><strong>Funcionário:</strong> ${e.funcionario}</p>
-      <p><strong>Documento:</strong> ${e.documentoFuncionario}</p>
-      <p><strong>Data Cadastro:</strong> ${new Date(e.dataHoraCadastro).toLocaleString("pt-BR")}</p>
-      <p><strong>Status:</strong> ${e.entregue ? "✅ Entregue" : "📦 Pendente"}</p>
-      ${e.entrega.retirante ? `<p><strong>Entregue por:</strong> ${e.entrega.retirante}</p>` : ""}
-      ${e.entrega.documento ? `<p><strong>Documento:</strong> ${e.entrega.documento}</p>` : ""}
-      ${e.entrega.dataHora ? `<p><strong>Data/Hora Entrega:</strong> ${new Date(e.entrega.dataHora).toLocaleString("pt-BR")}</p>` : ""}
-      ${e.foto ? `<img src="${e.foto}" style="max-width:100%;border-radius:5px;margin-top:10px;">` : ""}
-      <button id="fecharModal" style="margin-top:15px;padding:10px 20px;">Fechar</button>
-    </div>
-  `;
-
-  document.body.appendChild(modal);
-  document.getElementById("fecharModal").onclick = () => modal.remove();
-}
-
-// =====================
-// GERAR PDF COM TODOS OS REGISTROS
-// =====================
-async function gerarPDF() {
-  const { jsPDF } = window.jspdf; 
-  const lista = JSON.parse(localStorage.getItem("encomendas")) || [];
-
-  if(lista.length === 0) {
-    alert("Nenhuma encomenda para gerar PDF!");
-    return;
-  }
-
-  const doc = new jsPDF();
-  doc.setFontSize(18);
-  doc.text("📦 Relatório de Encomendas", 105, 15, { align: "center" });
-
-  let y = 25;
-  const margemEsq = 10;
-  const linhaAltura = 10;
-
-  lista.forEach((e, i) => {
-    doc.setFontSize(12);
-    doc.text(`Encomenda ${i+1} - ID: ${e.id}`, margemEsq, y); y += linhaAltura;
-    doc.text(`Rastreio: ${e.rastreio}`, margemEsq, y); y += linhaAltura;
-    doc.text(`Destinatário: ${e.destinatario}`, margemEsq, y); y += linhaAltura;
-    doc.text(`Apto: ${e.apartamento}  Bloco: ${e.bloco}`, margemEsq, y); y += linhaAltura;
-    doc.text(`Transportadora: ${e.transportadora}`, margemEsq, y); y += linhaAltura;
-    doc.text(`Funcionário: ${e.funcionario}  Documento: ${e.documentoFuncionario}`, margemEsq, y); y += linhaAltura;
-    doc.text(`Data/Hora Cadastro: ${new Date(e.dataHoraCadastro).toLocaleString("pt-BR")}`, margemEsq, y); y += linhaAltura;
-    doc.text(`Status: ${e.entregue ? "✅ Entregue" : "📦 Pendente"}`, margemEsq, y); y += linhaAltura;
-
-    if(e.entregue) {
-      doc.text(`Entregue por: ${e.entrega.retirante}  Documento: ${e.entrega.documento}`, margemEsq, y); y += linhaAltura;
-      doc.text(`Data/Hora Entrega: ${new Date(e.entrega.dataHora).toLocaleString("pt-BR")}`, margemEsq, y); y += linhaAltura;
+    if (encomenda) {
+      encomenda.entrega.assinatura = assinaturaBase64; // Salva a assinatura
+      localStorage.setItem("encomendas", JSON.stringify(lista));
+      alert("Assinatura registrada com sucesso!");
     }
-
-    if(e.foto) {
-      try {
-        doc.addImage(e.foto, 'JPEG', margemEsq, y, 50, 50);
-        y += 55;
-      } catch(err) {
-        console.log("Erro ao adicionar imagem no PDF", err);
-      }
-    } else { y += 5; }
-
-    y += 5;
-    if(y > 270) { doc.addPage(); y = 20; }
-  });
-
-  doc.save("encomendas_relatorio.pdf");
+  } else {
+    alert("Por favor, forneça uma assinatura.");
+  }
 }
