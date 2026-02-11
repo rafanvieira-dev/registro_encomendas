@@ -1,3 +1,4 @@
+
 // =====================
 // FUNÇÕES ÚTEIS
 // =====================
@@ -174,54 +175,4 @@ function mostrarDetalhes(id) {
 
   document.body.appendChild(modal);
   document.getElementById("fecharModal").onclick = () => modal.remove();
-
-  
-// =====================
-// GERAR RELATÓRIO PDF
-// =====================
-async function gerarPDF() {
-
-  // garante carregamento da biblioteca
-  if (!window.jspdf) {
-    await new Promise((resolve) => {
-      const script = document.createElement("script");
-      script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
-      script.onload = resolve;
-      document.head.appendChild(script);
-    });
-  }
-
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-
-  const lista = JSON.parse(localStorage.getItem("encomendas")) || [];
-
-  if (lista.length === 0) {
-    alert("Não há encomendas cadastradas.");
-    return;
-  }
-
-  doc.setFontSize(14);
-  doc.text("RELATÓRIO DE ENCOMENDAS", 10, 10);
-
-  let y = 20;
-
-  lista.forEach((e, i) => {
-
-    const status = e.entregue ? "ENTREGUE" : "PENDENTE";
-
-    doc.setFontSize(10);
-    doc.text(`${i + 1} - ${e.destinatario}`, 10, y); y += 6;
-    doc.text(`Apto ${e.apartamento} Bloco ${e.bloco}`, 10, y); y += 6;
-    doc.text(`Rastreio: ${e.rastreio}`, 10, y); y += 6;
-    doc.text(`Status: ${status}`, 10, y); y += 10;
-
-    if (y > 270) {
-      doc.addPage();
-      y = 20;
-    }
-  });
-
-  doc.save("relatorio_encomendas.pdf");
 }
-
