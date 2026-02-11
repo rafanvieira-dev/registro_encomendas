@@ -155,11 +155,11 @@ div[style*="position: fixed"] img {
    =========================== */
 
 .menu {
-  border: 3px solid #1d05f5;
-  border-radius: 8px;
-  padding: 25px;
-  max-width: 420px;
-  margin: 30px auto;
+  border: 10px solid #1d05f5;
+  border-radius: 16px;
+  padding: 50px;
+  max-width: 820px;
+  margin: 60px auto;
   background: #fff;
 }
 
