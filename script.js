@@ -175,14 +175,20 @@ function mostrarDetalhes(id) {
   document.body.appendChild(modal);
   document.getElementById("fecharModal").onclick = () => modal.remove();
 
-  // =====================
+  
+// =====================
 // GERAR RELATÓRIO PDF
 // =====================
-function gerarPDF() {
+async function gerarPDF() {
 
+  // garante carregamento da biblioteca
   if (!window.jspdf) {
-    alert("Erro ao carregar biblioteca de PDF. Recarregue a página.");
-    return;
+    await new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+      script.onload = resolve;
+      document.head.appendChild(script);
+    });
   }
 
   const { jsPDF } = window.jspdf;
@@ -204,16 +210,12 @@ function gerarPDF() {
 
     const status = e.entregue ? "ENTREGUE" : "PENDENTE";
 
-    const linha1 = `${i + 1} - ${e.destinatario} | Apto ${e.apartamento} Bloco ${e.bloco}`;
-    const linha2 = `Rastreio: ${e.rastreio} | Status: ${status}`;
-
     doc.setFontSize(10);
-    doc.text(linha1, 10, y);
-    y += 6;
-    doc.text(linha2, 10, y);
-    y += 10;
+    doc.text(`${i + 1} - ${e.destinatario}`, 10, y); y += 6;
+    doc.text(`Apto ${e.apartamento} Bloco ${e.bloco}`, 10, y); y += 6;
+    doc.text(`Rastreio: ${e.rastreio}`, 10, y); y += 6;
+    doc.text(`Status: ${status}`, 10, y); y += 10;
 
-    // quebra automática de página
     if (y > 270) {
       doc.addPage();
       y = 20;
@@ -223,4 +225,3 @@ function gerarPDF() {
   doc.save("relatorio_encomendas.pdf");
 }
 
-}
