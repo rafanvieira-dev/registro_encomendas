@@ -174,4 +174,53 @@ function mostrarDetalhes(id) {
 
   document.body.appendChild(modal);
   document.getElementById("fecharModal").onclick = () => modal.remove();
+
+  // =====================
+// GERAR RELATÓRIO PDF
+// =====================
+function gerarPDF() {
+
+  if (!window.jspdf) {
+    alert("Erro ao carregar biblioteca de PDF. Recarregue a página.");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  const lista = JSON.parse(localStorage.getItem("encomendas")) || [];
+
+  if (lista.length === 0) {
+    alert("Não há encomendas cadastradas.");
+    return;
+  }
+
+  doc.setFontSize(14);
+  doc.text("RELATÓRIO DE ENCOMENDAS", 10, 10);
+
+  let y = 20;
+
+  lista.forEach((e, i) => {
+
+    const status = e.entregue ? "ENTREGUE" : "PENDENTE";
+
+    const linha1 = `${i + 1} - ${e.destinatario} | Apto ${e.apartamento} Bloco ${e.bloco}`;
+    const linha2 = `Rastreio: ${e.rastreio} | Status: ${status}`;
+
+    doc.setFontSize(10);
+    doc.text(linha1, 10, y);
+    y += 6;
+    doc.text(linha2, 10, y);
+    y += 10;
+
+    // quebra automática de página
+    if (y > 270) {
+      doc.addPage();
+      y = 20;
+    }
+  });
+
+  doc.save("relatorio_encomendas.pdf");
+}
+
 }
